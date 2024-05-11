@@ -33,7 +33,9 @@ async function run() {
   const foodCollection = client.db('foodSharing').collection('food');
 
   app.get('/sixFood', async(req,res)=>{
-    
+    const cursor = foodCollection.find().limit(6);
+    const result = await cursor.toArray();
+    res.send(result);
   })
 
     await client.db("admin").command({ ping: 1 });
