@@ -53,9 +53,12 @@ async function run() {
 
   app.get('/allFood', async(req,res)=>{
     const sort = req.query.sort
+    const search = req.query.search
     console.log(sort);
 
-    let query = {}
+    let query = {
+      food_name: { $regex : search, $options: 'i'}
+    }
     let options = {}
     if(sort) options={sort: {expired_date: sort === 'asc' ? 1 : -1}}
     const cursor = foodCollection.find(query, options);
