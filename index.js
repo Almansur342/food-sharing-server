@@ -31,12 +31,20 @@ async function run() {
   try {
 
   const foodCollection = client.db('foodSharing').collection('food');
+  const requestCollection = client.db('foodSharing').collection('request');
 
   app.get('/sixFood', async(req,res)=>{
     const cursor = foodCollection.find().limit(6);
     const result = await cursor.toArray();
     res.send(result);
   });
+
+  // save a request data
+  app.post('/request', async(req,res)=>{
+    const info = req.body;
+    const result = await requestCollection.insertOne(info)
+    res.send(result)
+  })
 
   app.get('/details/:id', async(req,res)=>{
     const id = req.params.id;
