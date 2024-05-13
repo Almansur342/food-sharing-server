@@ -80,6 +80,20 @@ async function run() {
     res.send(result)
   })
 
+  app.put('/update/:id', async(req,res)=>{
+    const id = req.params.id;
+    const info = req.body
+    const query = {_id: new ObjectId(id)}
+    const options = {upsert: true}
+    const updateDoc = {
+      $set:{
+        ...info,
+      },
+    }
+    const result = await foodCollection.updateOne(query,updateDoc,options)
+    res.send(result)
+  })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
