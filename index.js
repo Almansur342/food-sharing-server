@@ -52,7 +52,13 @@ async function run() {
   });
 
   app.get('/allFood', async(req,res)=>{
-    const cursor = foodCollection.find();
+    const sort = req.query.sort
+    console.log(sort);
+
+    let query = {}
+    let options = {}
+    if(sort) options={sort: {expired_date: sort === 'asc' ? 1 : -1}}
+    const cursor = foodCollection.find(query, options);
     const result = await cursor.toArray();
     res.send(result);
   });
