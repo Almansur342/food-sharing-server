@@ -44,7 +44,14 @@ async function run() {
     const info = req.body;
     const result = await requestCollection.insertOne(info)
     res.send(result)
-  })
+  });
+
+  app.get('/requestedFood/:email', async(req,res)=>{
+    const email = req.params.email;
+    const query = {requestor: email}
+    const results = await requestCollection.find(query).toArray()
+    res.send(results)
+  });
 
   app.get('/details/:id', async(req,res)=>{
     const id = req.params.id;
