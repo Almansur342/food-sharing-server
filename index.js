@@ -9,8 +9,10 @@ const app = express();
 
 const corsOptions = {
   origin: [
-    'http://localhost:5173',
-    'http://localhost:5174'
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://food-sharing-b90bf.web.app",
+    "https://food-sharing-b90bf.firebaseapp.com"
   ],
   credentials: true,
   optionSuccessStatus: 200,
@@ -47,6 +49,13 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+const cookeOPtion = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production' ? true : false,
+  sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict',
+}
+
 async function run() {
   try {
 
@@ -59,21 +68,12 @@ async function run() {
       const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{
         expiresIn:'365d'
       })
-      res.cookie('token', token,{
-        httpOnly: true,
-        secure: process.env.NODE_ENV=== 'production',
-        sameSite: process.env.NODE_ENV=== 'production'? 'none' : 'strict'
-      }).send({success: true})
+      res.cookie('token', token, cookeOPtion).send({success: true})
     })
 
     // clear token after logout
     app.get('/logout', (req,res)=>{
-      res.clearCookie('token',{
-        httpOnly: true,
-        secure: process.env.NODE_ENV=== 'production',
-        sameSite: process.env.NODE_ENV=== 'production'? 'none' : 'strict',
-        maxAge:0,
-      }).send({success: true})
+      res.clearCookie('token', {...cookeOPtion, maxAge:0}).send({success: true})
     })
 
 
@@ -90,12 +90,12 @@ async function run() {
     res.send(result)
   });
 
-  app.get('/requestedFood/:email', verifyToken, async(req,res)=>{
-    const tokenEmail = req.user.email
+  app.get('/requestedFood/:email', async(req,res)=>{
+    // const tokenEmail = req.user.email
     const email = req.params.email
-    if(tokenEmail !== email){
-      return res.status(403).send({message:"forbidden access"})
-    }
+    // if(tokenEmail !== email){
+    //   return res.status(403).send({message:"forbidden access"})
+    // }
     const query = {requestor: email}
     const results = await requestCollection.find(query).toArray()
     res.send(results)
@@ -169,8 +169,8 @@ async function run() {
     res.send(result)
   })
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     
   }
